@@ -77,6 +77,30 @@ body{
 #topbar nav a.on::after{
   content:'';position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--alert);
 }
+.tb-actions{display:flex;align-items:center;gap:10px}
+.tb-btn,.mini-btn{
+  appearance:none;border:1px solid var(--rule);background:rgba(255,255,255,.62);
+  color:var(--body);border-radius:7px;font:inherit;cursor:pointer;
+  transition:background .2s ease,border-color .2s ease,color .2s ease,transform .2s ease;
+}
+.tb-btn{height:30px;padding:0 10px;font-size:12px;letter-spacing:.05em;white-space:nowrap}
+.tb-btn:hover,.mini-btn:hover{background:var(--card);border-color:#BEB8AC;color:var(--ink)}
+.tb-btn:active,.mini-btn:active{transform:translateY(1px)}
+.tb-btn:focus-visible,.mini-btn:focus-visible,.mobile-nav a:focus-visible{outline:3px solid rgba(29,78,137,.22);outline-offset:2px}
+.mobile-nav{position:fixed;top:56px;left:0;right:0;z-index:39;background:rgba(250,248,244,.97);border-bottom:1px solid var(--rule);box-shadow:0 18px 32px -28px rgba(26,26,24,.65)}
+.mobile-nav[hidden]{display:none}
+.mobile-nav-inner{max-width:760px;margin:0 auto;padding:18px 24px 22px}
+.mobile-nav-head{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:12px;letter-spacing:.12em}
+.mobile-nav nav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.mobile-nav a{display:block;padding:9px 8px;border:1px solid var(--rule);border-radius:7px;color:var(--body);font-size:13px;text-align:center;text-decoration:none}
+.mobile-nav a:hover,.mobile-nav a.on{background:var(--card);color:var(--ink);border-color:#BEB8AC}
+.mobile-nav-actions{display:flex;justify-content:flex-end;margin-top:14px}
+.ctl-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.mini-btn{padding:5px 9px;font-size:12px;color:var(--muted)}
+.toolrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px}
+.tool-status{font-size:12px;color:var(--muted);min-height:1.9em}
+.share-btn{border-color:var(--accent);color:var(--accent)}
+input[type=range]{--pct:50%;background:linear-gradient(to right,var(--accent) 0,var(--accent) var(--pct),var(--rule) var(--pct),var(--rule) 100%)}
 
 /* ---------- 首屏 ---------- */
 .hero{min-height:92vh;display:flex;flex-direction:column;justify-content:center;padding:110px 0 70px}
@@ -231,6 +255,8 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
 @media (max-width:560px){
   #topbar nav{display:none}
   .tb-brand span{display:none}
+  .tb-btn{padding:0 9px}
+  .mobile-nav nav{grid-template-columns:repeat(2,1fr)}
 }
 </style>
 </head>
@@ -247,6 +273,23 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
       <a href="#act3" data-t="act3">看错</a>
       <a href="#act4" data-t="act4">代价</a>
     </nav>
+    <div class="tb-actions">
+      <button class="tb-btn" id="resetBtn" type="button" title="恢复默认实验参数">重置实验</button>
+      <button class="tb-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mobileNav">目录</button>
+    </div>
+  </div>
+</div>
+
+<div class="mobile-nav" id="mobileNav" hidden>
+  <div class="mobile-nav-inner">
+    <div class="mobile-nav-head"><span>实验章节</span><button class="tb-btn" id="closeMenuBtn" type="button">关闭</button></div>
+    <nav aria-label="移动端章节目录">
+      <a href="#act1" data-t="act1">第一幕 · 抓空</a>
+      <a href="#act2" data-t="act2">第二幕 · 看见</a>
+      <a href="#act3" data-t="act3">第三幕 · 看错</a>
+      <a href="#act4" data-t="act4">第四幕 · 代价</a>
+    </nav>
+    <div class="mobile-nav-actions"><button class="mini-btn" id="mobileResetBtn" type="button">恢复默认参数</button></div>
   </div>
 </div>
 
@@ -341,6 +384,10 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
     <div class="ctl-head"><label for="focal">焦距 f</label><b><span id="focalVal">500</span> px</b></div>
     <input type="range" id="focal" min="260" max="1100" step="10" value="500">
     <div class="ctl-scale"><span>广角</span><span>长焦</span></div>
+    <div class="ctl-actions" aria-label="焦距预设">
+      <button class="mini-btn" type="button" data-focal="320">广角预设</button>
+      <button class="mini-btn" type="button" data-focal="800">长焦预设</button>
+    </div>
   </div>
 
   <div class="readout">
@@ -380,6 +427,11 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
     <div class="ctl-head"><label for="dist">畸变强度 k₁</label><b><span id="distVal">-0.12</span></b></div>
     <input type="range" id="dist" min="-0.45" max="0.25" step="0.005" value="-0.12">
     <div class="ctl-scale"><span>桶形（向内塌）</span><span>枕形（向外鼓）</span></div>
+    <div class="ctl-actions" aria-label="畸变预设">
+      <button class="mini-btn" type="button" data-dist="0">归零对照</button>
+      <button class="mini-btn" type="button" data-dist="-0.3">强桶形</button>
+      <button class="mini-btn" type="button" data-dist="0.18">强枕形</button>
+    </div>
   </div>
 
   <div class="readout">
@@ -408,9 +460,14 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
   </div>
 
   <div class="readout">
-    <div><span class="k">当前角点偏移</span><span class="v" id="errC">—<span class="u">px</span></span></div>
-    <div><span class="k">示意成功率</span><span class="v" id="succVal">—<span class="u">%</span></span></div>
-    <div><span class="k">相对理想状态</span><span class="v" id="dropVal">—</span></div>
+    <div><span class="k">当前角点偏移</span><span class="v" id="errC" aria-live="polite">—<span class="u">px</span></span></div>
+    <div><span class="k">示意成功率</span><span class="v" id="succVal" aria-live="polite">—<span class="u">%</span></span></div>
+    <div><span class="k">相对理想状态</span><span class="v" id="dropVal" aria-live="polite">—</span></div>
+  </div>
+
+  <div class="toolrow">
+    <button class="mini-btn share-btn" id="shareBtn" type="button">复制当前实验链接</button>
+    <span class="tool-status" id="shareStatus" role="status" aria-live="polite"></span>
   </div>
 
   <div class="note">
@@ -854,6 +911,13 @@ var elErrMax = document.getElementById('errMax');
 var elVerd   = document.getElementById('verdict');
 var elSucc   = document.getElementById('succVal');
 var elDrop   = document.getElementById('dropVal');
+var resetBtn = document.getElementById('resetBtn');
+var mobileResetBtn = document.getElementById('mobileResetBtn');
+var menuBtn = document.getElementById('menuBtn');
+var closeMenuBtn = document.getElementById('closeMenuBtn');
+var mobileNav = document.getElementById('mobileNav');
+var shareBtn = document.getElementById('shareBtn');
+var shareStatus = document.getElementById('shareStatus');
 
 function fmt(n, d){
   if (!isFinite(n)) return '—';
@@ -896,6 +960,8 @@ function render(){
   elErrC.innerHTML = fmt(st.rms, 1) + '<span class="u">px</span>';
   elSucc.innerHTML = fmt(s, 0) + '<span class="u">%</span>';
   elDrop.textContent = s >= 99.5 ? '几乎无损' : '下降 ' + fmt(100 - s, 0) + ' 个百分点';
+  elFocal.style.setProperty('--pct', (((state.f - F_MIN) / (F_MAX - F_MIN)) * 100).toFixed(2) + '%');
+  elDist.style.setProperty('--pct', (((state.k1 - K_MIN) / (K_MAX - K_MIN)) * 100).toFixed(2) + '%');
 }
 
 /* ==================================================
@@ -911,8 +977,65 @@ function onDist(){
   render();
 }
 
+function setPreset(kind, value){
+  if (kind === 'focal') { elFocal.value = value; onFocal(); }
+  if (kind === 'dist') { elDist.value = value; onDist(); }
+}
+
+function resetExperiment(){
+  setPreset('focal', 500);
+  setPreset('dist', -0.12);
+  shareStatus.textContent = '已恢复默认参数';
+  setTimeout(function(){ shareStatus.textContent = ''; }, 1800);
+}
+
+function setMenu(open){
+  mobileNav.hidden = !open;
+  menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+function copyShareLink(){
+  var url = new URL(window.location.href);
+  url.hash = 'act3';
+  url.searchParams.set('f', Math.round(state.f));
+  url.searchParams.set('k', state.k1.toFixed(3));
+  var text = url.toString();
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      shareStatus.textContent = '链接已复制，可直接分享当前参数';
+    }).catch(function(){ shareStatus.textContent = text; });
+  } else {
+    shareStatus.textContent = text;
+  }
+  setTimeout(function(){ if (shareStatus.textContent === '链接已复制，可直接分享当前参数') shareStatus.textContent = ''; }, 2600);
+}
+
 elFocal.addEventListener('input', onFocal);
 elDist.addEventListener('input', onDist);
+resetBtn.addEventListener('click', resetExperiment);
+mobileResetBtn.addEventListener('click', resetExperiment);
+menuBtn.addEventListener('click', function(){ setMenu(mobileNav.hidden); });
+closeMenuBtn.addEventListener('click', function(){ setMenu(false); });
+shareBtn.addEventListener('click', copyShareLink);
+Array.prototype.forEach.call(document.querySelectorAll('[data-focal]'), function(btn){
+  btn.addEventListener('click', function(){ setPreset('focal', parseFloat(btn.getAttribute('data-focal'))); });
+});
+Array.prototype.forEach.call(document.querySelectorAll('[data-dist]'), function(btn){
+  btn.addEventListener('click', function(){ setPreset('dist', parseFloat(btn.getAttribute('data-dist'))); });
+});
+Array.prototype.forEach.call(document.querySelectorAll('.mobile-nav a'), function(a){
+  a.addEventListener('click', function(){ setMenu(false); });
+});
+
+// 从分享链接恢复实验参数
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var f = parseFloat(params.get('f')), k = parseFloat(params.get('k'));
+  if (isFinite(f) && f >= F_MIN && f <= F_MAX) elFocal.value = f;
+  if (isFinite(k) && k >= K_MIN && k <= K_MAX) elDist.value = k;
+  state.f = parseFloat(elFocal.value);
+  state.k1 = parseFloat(elDist.value);
+})();
 
 /* ==================================================
    八、视频槽位
