@@ -226,7 +226,8 @@ input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(
   display:block;margin-top:10px;font-size:12px;line-height:1.9;
   color:rgba(255,255,255,.34);max-width:24em;letter-spacing:.02em;
 }
-.reel video{width:100%;height:auto;display:block;border-radius:14px;background:#0E1014}
+.reel video{width:100%;height:auto;display:block;border-radius:14px;background:#0E1014;accent-color:var(--accent)}
+.reel video:focus-visible{outline:3px solid rgba(29,78,137,.32);outline-offset:3px}
 
 /* ---------- 尾声 ---------- */
 .endgrid{margin-top:40px;display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:12px;overflow:hidden}
@@ -918,6 +919,7 @@ var closeMenuBtn = document.getElementById('closeMenuBtn');
 var mobileNav = document.getElementById('mobileNav');
 var shareBtn = document.getElementById('shareBtn');
 var shareStatus = document.getElementById('shareStatus');
+var activeSection = 'top';
 
 function fmt(n, d){
   if (!isFinite(n)) return '—';
@@ -996,7 +998,7 @@ function setMenu(open){
 
 function copyShareLink(){
   var url = new URL(window.location.href);
-  url.hash = 'act3';
+  url.hash = activeSection && activeSection !== 'top' ? activeSection : 'top';
   url.searchParams.set('f', Math.round(state.f));
   url.searchParams.set('k', state.k1.toFixed(3));
   var text = url.toString();
@@ -1053,6 +1055,9 @@ Array.prototype.forEach.call(document.querySelectorAll('.mobile-nav a'), functio
     var v = document.createElement('video');
     v.muted = true;
     v.loop = true;
+    v.controls = true;
+    v.preload = 'metadata';
+    v.setAttribute('aria-label', '实验录像：相机坐标偏移导致机械臂抓空');
     v.setAttribute('playsinline', '');
     v.addEventListener('loadeddata', function(){
       box.innerHTML = '';
@@ -1107,6 +1112,7 @@ function onScroll(){
   for (i = 0; i < tbLinks.length; i++){
     tbLinks[i].classList.toggle('on', tbLinks[i].getAttribute('data-t') === cur);
   }
+  activeSection = cur || 'top';
 }
 window.addEventListener('scroll', onScroll, { passive: true });
 
