@@ -14,7 +14,7 @@
 
   【换成你自己的素材】
   1. 抓取视频：把 mp4 命名为 grab.mp4，或使用 grab.webm 放在本文件同目录，第一幕会自动播放。
-  2. 第四幕成功率曲线：搜索 REAL_DATA，按格式填入实测数据点即可替换示意曲线。
+  2. 第五幕成功率曲线：搜索 REAL_DATA，按格式填入实测数据点即可替换示意曲线。
   3. 配色与文案：:root 里的颜色变量；正文在 HTML 里直接改。
 
   【注意】网页里所有数字都是浏览器里实时算出来的，不是写死的图片。
@@ -78,6 +78,7 @@ body{
   content:'';position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--alert);
 }
 .tb-actions{display:flex;align-items:center;gap:10px}
+#menuBtn{display:none}
 .tb-btn,.mini-btn{
   appearance:none;border:1px solid var(--rule);background:rgba(255,255,255,.62);
   color:var(--body);border-radius:7px;font:inherit;cursor:pointer;
@@ -98,12 +99,22 @@ body{
 .ctl-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .mini-btn{padding:5px 9px;font-size:12px;color:var(--muted)}
 .toolrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px}
-.tool-status{font-size:12px;color:var(--muted);min-height:1.9em}
+.tool-status{font-size:12px;color:var(--muted);min-height:1.9em;overflow-wrap:anywhere}
+.notice{position:fixed;left:50%;bottom:24px;z-index:80;transform:translateX(-50%);max-width:calc(100vw - 32px);padding:9px 14px;border-radius:7px;background:var(--ink);color:#fff;font-size:13px;line-height:1.5;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.16)}
+.notice[hidden]{display:none}
 .share-btn{border-color:var(--accent);color:var(--accent)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:12px;font-size:12px;color:var(--muted);line-height:1.6}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;background:#FF8A63}
+.legend .predicted i{background:transparent;border:2px solid #75C9DD}
+.experiment-feedback{margin-top:18px;min-height:1.9em;color:var(--accent);font-size:14px}
+.detail{margin-top:30px;padding:14px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);font-size:15px}
+.detail summary{cursor:pointer;font-weight:600;color:var(--ink)}
+.detail p{margin:10px 0 4px;font-size:15px}
 input[type=range]{--pct:50%;background:linear-gradient(to right,var(--accent) 0,var(--accent) var(--pct),var(--rule) var(--pct),var(--rule) 100%)}
 
 /* ---------- 首屏 ---------- */
-.hero{min-height:92vh;display:flex;flex-direction:column;justify-content:center;padding:110px 0 70px}
+.hero{min-height:92vh;display:flex;flex-direction:column;justify-content:center;padding:110px 24px 70px}
 .eyebrow{font-size:12px;letter-spacing:.22em;color:var(--muted)}
 h1{
   font-size:clamp(54px,10.5vw,100px);line-height:1.02;letter-spacing:-.03em;
@@ -203,6 +214,7 @@ input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(
   position:absolute;top:18px;right:18px;font-size:11px;letter-spacing:.1em;
   padding:4px 9px;border-radius:100px;background:rgba(181,67,46,.16);
   color:#F0957D;border:1px solid rgba(240,149,125,.35);
+  z-index:1;
 }
 .stage{position:relative}
 
@@ -255,6 +267,7 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
 }
 @media (max-width:560px){
   #topbar nav{display:none}
+  #menuBtn{display:block}
   .tb-brand span{display:none}
   .tb-btn{padding:0 9px}
   .mobile-nav nav{grid-template-columns:repeat(2,1fr)}
@@ -272,7 +285,8 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
       <a href="#act1" data-t="act1">抓空</a>
       <a href="#act2" data-t="act2">看见</a>
       <a href="#act3" data-t="act3">看错</a>
-      <a href="#act4" data-t="act4">代价</a>
+      <a href="#act4" data-t="act4">标定</a>
+      <a href="#act5" data-t="act5">代价</a>
     </nav>
     <div class="tb-actions">
       <button class="tb-btn" id="resetBtn" type="button" title="恢复默认实验参数">重置实验</button>
@@ -281,6 +295,8 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
   </div>
 </div>
 
+<div class="notice" id="notice" role="status" aria-live="polite" hidden></div>
+
 <div class="mobile-nav" id="mobileNav" hidden>
   <div class="mobile-nav-inner">
     <div class="mobile-nav-head"><span>实验章节</span><button class="tb-btn" id="closeMenuBtn" type="button">关闭</button></div>
@@ -288,7 +304,8 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
       <a href="#act1" data-t="act1">第一幕 · 抓空</a>
       <a href="#act2" data-t="act2">第二幕 · 看见</a>
       <a href="#act3" data-t="act3">第三幕 · 看错</a>
-      <a href="#act4" data-t="act4">第四幕 · 代价</a>
+      <a href="#act4" data-t="act4">第四幕 · 标定</a>
+      <a href="#act5" data-t="act5">第五幕 · 代价</a>
     </nav>
     <div class="mobile-nav-actions"><button class="mini-btn" id="mobileResetBtn" type="button">恢复默认参数</button></div>
   </div>
@@ -365,9 +382,9 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
 <!-- ============ 第二幕 ============ -->
 <section class="wrap reveal" id="act2">
   <div class="act-no">第 二 幕</div>
-  <h2>机器不会「看」<br><em>它只做一次除法</em></h2>
+  <h2>机器不会「看」<br><em>它先做一次除法</em></h2>
 
-  <p class="lead">相机没有眼睛。三维世界里一个点，落在镜头平面上，被压扁成二维画面上的一个像素——这一步叫投影，用到的公式只有一个分式。</p>
+  <p class="lead">三维世界里一个点，落在相机画面上，变成二维像素坐标——这一步叫投影。在这个简化模型里，关键是用深度做一次除法。</p>
 
   <div class="formula">
     <var>u</var> = <var>f</var> · <var>X</var> / <var>Z</var> + <var>c<sub>x</sub></var><br>
@@ -393,13 +410,13 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
 
   <div class="readout">
     <div><span class="k">水平视场角</span><span class="v" id="fovVal">65.2<span class="u">°</span></span></div>
-    <div><span class="k">横向可见格数</span><span class="v" id="cellCount">—<span class="u">列</span></span></div>
+    <div><span class="k">理想可见格数</span><span class="v" id="cellCount">—<span class="u">列</span></span></div>
     <div><span class="k">每格边长</span><span class="v" id="cellPx">—<span class="u">px</span></span></div>
   </div>
 
-  <p>焦距只改变「看多少」，不改变「看多歪」。畸变是镜头本身的毛病，把镜头拉长拉短，它一丝都不会变好。</p>
+  <p>在这个简化实验里，拖动焦距只改变取景范围，畸变系数保持不变。因此下面统计的偏移量也不会随取景变窄而变小；真实镜头换了焦段，还要检查原来的标定参数是否适用。</p>
 
-  <p>所以标定从来不是拍一张照片就算完。得换着距离、换着角度拍几十张，把误差在不同位置、不同姿态下都逼出来——只有这样，那十几个参数才估得住。</p>
+  <p>所以标定通常需要从不同距离、不同角度拍摄多张照片，让角点分布到画面的不同位置，才有足够的信息估计参数并检查误差。</p>
 </section>
 
 <!-- ============ 第三幕 ============ -->
@@ -407,13 +424,14 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
   <div class="act-no">第 三 幕</div>
   <h2>什么叫「看错」<br><em>镜头根本不按那个公式来</em></h2>
 
-  <p class="lead">上面的公式假设镜头是一个理想的针孔：一条光线直直穿过中心。真实的镜头是一片玻璃，光线从边缘穿过时偏折得比中间更多，于是整幅画面被向外或向内挤出一圈弧。</p>
+  <p class="lead">上面的公式假设相机是一个理想的针孔：光线穿过同一个中心。真实镜头由镜片组成，成像不完全符合这个模型，画面边缘的直线可能看起来向外或向内弯曲。</p>
 
-  <p>这叫<b>径向畸变</b>。鱼眼镜头是它的极端形态——你见过的门镜、行车记录仪那种球形失真，都是同一个来源。</p>
+  <p>这种围绕画面中心变化的弯曲叫<b>径向畸变</b>。广角照片边缘的直线变弯，是最容易注意到的例子。</p>
 
   <div class="formula">
-    <var>x<sub>d</sub></var> = <var>x</var> · ( 1 + <var>k</var><sub>1</sub> · <var>r</var><sup>2</sup> ) &nbsp;&nbsp;,&nbsp;&nbsp; <var>r</var><sup>2</sup> = <var>x</var><sup>2</sup> + <var>y</var><sup>2</sup>
-    <span class="cap"><b>r</b> 是离画面中心的距离，<b>k</b><sub>1</sub> 是畸变系数。注意它是按 r 的平方算的——所以越靠边，偏差涨得越快；正中心的像素几乎不动。</span>
+    <var>x<sub>d</sub></var> = <var>x</var> · ( 1 + <var>k</var><sub>1</sub> · <var>r</var><sup>2</sup> )<br>
+    <var>y<sub>d</sub></var> = <var>y</var> · ( 1 + <var>k</var><sub>1</sub> · <var>r</var><sup>2</sup> ) &nbsp;&nbsp;,&nbsp;&nbsp; <var>r</var><sup>2</sup> = <var>x</var><sup>2</sup> + <var>y</var><sup>2</sup>
+    <span class="cap"><b>r</b> 是归一化坐标下到画面中心的距离，<b>k</b><sub>1</sub> 是畸变系数。注意它是按 r 的平方算的——所以越靠边，偏差涨得越快；正中心的像素几乎不动。</span>
   </div>
 
   <p>下面是一片标定板上的黑白格子。它现在微微发弯，因为这就是相机真实拍到的样子——而肉眼看照片时，几乎察觉不到这件事。</p>
@@ -425,7 +443,7 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
   </div>
 
   <div class="ctl">
-    <div class="ctl-head"><label for="dist">畸变强度 k₁</label><b><span id="distVal">-0.12</span></b></div>
+    <div class="ctl-head"><label for="dist">畸变强度 k₁</label><b><span id="distVal">-0.120</span></b></div>
     <input type="range" id="dist" min="-0.45" max="0.25" step="0.005" value="-0.12">
     <div class="ctl-scale"><span>桶形（向内塌）</span><span>枕形（向外鼓）</span></div>
     <div class="ctl-actions" aria-label="畸变预设">
@@ -436,32 +454,103 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
   </div>
 
   <div class="readout">
-    <div><span class="k">角点平均偏移</span><span class="v" id="errB">—<span class="u">px</span></span></div>
+    <div><span class="k">角点偏移 RMS</span><span class="v" id="errB">—<span class="u">px</span></span></div>
     <div><span class="k">最大偏移</span><span class="v" id="errMax">—<span class="u">px</span></span></div>
     <div><span class="k">误差等级</span><span class="v" id="verdict" style="font-size:18px">—</span></div>
   </div>
 
+  <p>这里的 RMS 是固定参考画幅内角点偏移的均方根，比较的是「理想位置」与「畸变后位置」。它不是实拍照片的标定重投影误差，也不能直接换算成夹爪偏差。</p>
+
   <p>标定在做的事情，就是从几十张这样的照片里，把 <var>f</var>、<var>c<sub>x</sub></var>、<var>c<sub>y</sub></var>、<var>k</var><sub>1</sub>、<var>k</var><sub>2</sub> 这些参数反推出来。</p>
 
-  <p class="pull">一台相机十来个参数，每一个只能从画面里间接推断，每一个都有误差。误差不会凭空消失，它只会一路累积到你手指按下去的那一刻。</p>
+  <p class="pull">相机参数要从图像里间接估计，估计值可能有误差。如果没有检查和修正，位置偏差就可能传到控制端。</p>
 </section>
 
-<!-- ============ 第四幕 ============ -->
+<!-- ============ 第四幕：标定练习 ============ -->
 <section class="wrap reveal" id="act4">
   <div class="act-no">第 四 幕</div>
-  <h2>十几个像素，<br><em>到底算不算大事</em></h2>
+  <h2>知道它看错了，<br><em>怎样把参数找回来</em></h2>
 
-  <p class="lead">这个问题没法凭直觉回答。像素看起来很小，但抓取需要的精度也很小——夹爪合拢的余量常常只有几毫米。所以真正该问的是：误差涨一点，成功率掉多少？</p>
+  <p class="lead">标定的依据是<b>对应关系</b>：板上每个角点的位置已知，照片里也能找到它。给相机一个参数猜测，就能预测角点会落在哪里；不断调整参数，让预测与观测尽量重合。</p>
 
-  <p>下面的横轴是「角点偏移」，纵轴是「抓取成功率」。拖动上面的滑杆，橙点会跟着走。</p>
+  <p>试着给下面这台<b>独立的模拟相机</b>估计径向畸变系数。橙色实点是模拟观测位置，蓝色空圈是当前参数预测的位置。拖动滑杆，让两组点对齐。</p>
 
   <div class="stage">
-    <span class="badge">示意曲线 · 非实测</span>
-    <div class="canvas-box"><canvas id="chart" aria-label="折线图：角点偏移与抓取成功率的关系，橙点标记当前状态"></canvas></div>
+    <span class="badge">模拟角点 · 非实拍</span>
+    <div class="canvas-box"><canvas id="calib" aria-label="标定练习：橙色实点是模拟观测角点，蓝色空圈是当前参数预测位置"></canvas></div>
+  </div>
+  <div class="legend" aria-hidden="true"><span><i></i>模拟观测</span><span class="predicted"><i></i>参数预测</span></div>
+
+  <div class="ctl">
+    <div class="ctl-head"><label for="guess">你估计的 k₁</label><b id="guessVal">0.000</b></div>
+    <input type="range" id="guess" min="-0.45" max="0.25" step="0.005" value="0">
+    <div class="ctl-scale"><span>桶形</span><span>枕形</span></div>
+    <div class="ctl-actions">
+      <button class="mini-btn" id="checkGuess" type="button">检查拟合</button>
+      <button class="mini-btn" id="showAnswer" type="button">显示参考值</button>
+    </div>
+    <div class="experiment-feedback" id="calibFeedback" role="status" aria-live="polite"></div>
   </div>
 
   <div class="readout">
-    <div><span class="k">当前角点偏移</span><span class="v" id="errC" aria-live="polite">—<span class="u">px</span></span></div>
+    <div><span class="k">剩余角点偏差 RMS</span><span class="v" id="residualVal">—<span class="u">px</span></span></div>
+    <div><span class="k">最大偏差</span><span class="v" id="residualMax">—<span class="u">px</span></span></div>
+    <div><span class="k">参与拟合的角点</span><span class="v">9<span class="u">个</span></span></div>
+  </div>
+
+  <p>这一步是在<b>拟合参数</b>，不是在训练抓取模型。这里仅用一个系数和九个无噪声的模拟角点；真实标定还要同时估计焦距、主点、其他畸变参数与每张照片的相机姿态。</p>
+
+  <details class="detail">
+    <summary>为什么标定完还要用新照片检查？</summary>
+    <p>让参与拟合的角点靠近预测位置，只能说明参数解释了这些照片。再用没有参与拟合的照片检查残差，才能看出参数是否对新的距离和角度仍然适用。残差很小，也不保证抓取一定成功；机械臂的坐标变换和控制误差还需要单独检查。</p>
+  </details>
+</section>
+
+<!-- ============ 第五幕 ============ -->
+<section class="wrap reveal" id="act5">
+  <div class="act-no">第 五 幕</div>
+  <h2>十几个像素，<br><em>到底算不算大事</em></h2>
+
+  <p class="lead">这个问题没法凭直觉回答。若夹爪的抓取余量只有几毫米，就需要知道像素偏移如何影响目标定位。所以真正该问的是：误差涨一点，成功率会怎么变？</p>
+
+  <p>先做一个可以算的近似：在目标深度已知、只考虑横向位移时，像素偏差 Δu 对应的横向位移约为 <b>ΔX = Z · Δu / f</b>。调节像素偏差和距离，看看毫米数怎样变化；焦距沿用第二幕的设置。</p>
+
+  <div class="ctl">
+    <div class="ctl-head"><label for="pixelError">横向像素偏差 Δu</label><b><span id="pixelErrorVal">12</span> px</b></div>
+    <input type="range" id="pixelError" min="0" max="40" step="1" value="12">
+    <div class="ctl-scale"><span>0 px</span><span>40 px</span></div>
+  </div>
+  <div class="ctl">
+    <div class="ctl-head"><label for="depth">目标深度 Z</label><b><span id="depthVal">0.60</span> m</b></div>
+    <input type="range" id="depth" min="0.30" max="1.20" step="0.05" value="0.60">
+    <div class="ctl-scale"><span>0.30 m</span><span>1.20 m</span></div>
+  </div>
+  <div class="readout">
+    <div><span class="k">当前焦距</span><span class="v" id="convertFocal">—<span class="u">px</span></span></div>
+    <div><span class="k">横向位移近似</span><span class="v" id="worldError">—<span class="u">mm</span></span></div>
+    <div><span class="k">换算条件</span><span class="v" style="font-size:18px">已知深度</span></div>
+  </div>
+  <p>这个毫米数只是针孔模型下的单轴换算，不能直接当作夹爪实际偏差。它也不告诉我们抓取成功率；后者取决于目标尺寸、夹爪余量、坐标变换和控制系统。</p>
+
+  <p>横轴是第三幕计算的「角点偏移 RMS」，纵轴是示意抓取成功率。拖动下面的畸变滑杆，橙点会跟着走；这里和第三幕控制的是同一个参数。</p>
+
+  <div class="ctl">
+    <div class="ctl-head"><label for="dist5">镜头畸变 k₁</label><b id="dist5Val">-0.120</b></div>
+    <input type="range" id="dist5" min="-0.45" max="0.25" step="0.005" value="-0.12">
+    <div class="ctl-scale"><span>桶形</span><span>枕形</span></div>
+    <div class="ctl-actions" aria-label="曲线对照预设">
+      <button class="mini-btn" type="button" data-dist="0">归零对照</button>
+      <button class="mini-btn" type="button" data-dist="-0.3">强桶形</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <span class="badge">示意曲线 · 非实测</span>
+    <div class="canvas-box"><canvas id="chart" aria-label="示意折线图：角点偏移 RMS 与抓取成功率的关系，橙点标记当前状态"></canvas></div>
+  </div>
+
+  <div class="readout">
+    <div><span class="k">当前偏移 RMS</span><span class="v" id="errC" aria-live="polite">—<span class="u">px</span></span></div>
     <div><span class="k">示意成功率</span><span class="v" id="succVal" aria-live="polite">—<span class="u">%</span></span></div>
     <div><span class="k">相对理想状态</span><span class="v" id="dropVal" aria-live="polite">—</span></div>
   </div>
@@ -472,10 +561,10 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
   </div>
 
   <div class="note">
-    <b>关于这条曲线的诚实说明。</b>它的形状是示意的，不是我跑出来的实验数据。真实实验里这条曲线长什么样、拐点在哪里、有没有平台期，恰恰是这项课题最难也最有价值的部分——它需要成百上千次真实抓取才能回答。把这里的示意换成实测数据，这个作品才算真正立住。
+    <b>关于这条曲线的诚实说明。</b>它的形状是示意的，不是我跑出来的实验数据。真实实验里这条曲线长什么样、拐点在哪里、有没有平台期，需要重复、受控的真实抓取实验才能回答。把这里的示意换成实测数据，这个作品才算真正立住。
   </div>
 
-  <p>从这条示意曲线能读出一件确定的事：它<b>不是一条斜线</b>。十几个像素以内，曲线几乎是平的，人盯着看也察觉不到什么；可到了二十个像素上下，成功率已经掉了一半，再往后就往下坠。这就是为什么这类问题特别难在早期被发现——在崩掉之前，一切看起来都还正常。</p>
+  <p>这条曲线演示了一种可能的非线性关系。把畸变归零、再拨到强桶形，你会看到橙点穿过陡降段，示意成功率快速下滑。真实系统是否也有这样的拐点、拐点在哪里，必须通过抓取实验验证。</p>
 </section>
 
 <!-- ============ 尾声 ============ -->
@@ -486,7 +575,7 @@ footer .sig{margin-top:26px;font-size:12px;letter-spacing:.14em}
   <div class="endgrid">
     <article>
       <h3>关于数据</h3>
-      <p>页面里所有的棋盘格、投影、偏移量，都是浏览器实时算出来的，不是贴图。唯一不是算出的是第四幕那条成功率曲线——它是示意的，页面上也标了。这一点不能含糊。</p>
+      <p>页面里的棋盘格、投影和角点偏移量，都是浏览器实时算出来的，不是贴图。第五幕的成功率曲线使用预设示意函数，并非实验统计，页面上也标了。这一点不能含糊。</p>
     </article>
     <article>
       <h3>关于 AI</h3>
@@ -524,16 +613,18 @@ var HALF_Y = CELL * ROWS / 2;
 
 // 相机状态
 var state = { f: 500, k1: -0.12 };
+var CAL_TRUE = -0.23, calibrationGuess = 0;
+var pixelError = 12, depth = 0.60;
 
 // 滑杆范围
 var F_MIN = 260, F_MAX = 1100;
 var K_MIN = -0.45, K_MAX = 0.25;
 
 /* --------------------------------------------------
-   可替换：第四幕的成功率曲线
+   可替换：第五幕的成功率曲线
    有实测数据时，把下面的 null 换成数组，例如
    [{x:1.2, y:99.0}, {x:6.5, y:91.0}, {x:18, y:52.0}, {x:40, y:8.0}]
-   x = 角点偏移（像素），y = 抓取成功率（%）
+   x = 角点偏移 RMS（像素），y = 抓取成功率（%）
 -------------------------------------------------- */
 var REAL_DATA = null;
 
@@ -554,7 +645,7 @@ function project(x, y, f, sc, W, H, k1){
   return [W * 0.5 + f * sc * p[0], H * 0.5 + f * sc * p[1]];
 }
 
-// 重投影误差：角点被畸变推离理想位置的平均距离
+// 示意偏移：角点被畸变推离理想位置的均方根距离
 // 固定在参考焦距下、参考画幅内统计，避免取景变化影响读数
 var F_REF = 500;
 
@@ -581,6 +672,27 @@ function errorStats(){
     }
   }
   return { rms: n ? Math.sqrt(sum / n) : 0, max: max, n: n };
+}
+
+var calibrationPoints = [];
+[7, 14, 21].forEach(function(i){
+  [2, 5, 9].forEach(function(j){
+    calibrationPoints.push([-HALF_X + i * CELL, -HALF_Y + j * CELL]);
+  });
+});
+
+function calibrationStats(){
+  var sum = 0, max = 0;
+  calibrationPoints.forEach(function(point){
+    var actual = warp(point[0], point[1], CAL_TRUE);
+    var predicted = warp(point[0], point[1], calibrationGuess);
+    var dx = (actual[0] - predicted[0]) * F_REF;
+    var dy = (actual[1] - predicted[1]) * F_REF;
+    var distance = Math.sqrt(dx*dx + dy*dy);
+    sum += distance*distance;
+    if (distance > max) max = distance;
+  });
+  return { rms: Math.sqrt(sum / calibrationPoints.length), max: max };
 }
 
 // 成功率：有实测数据就插值，没有就用示意函数
@@ -776,6 +888,38 @@ function drawScene(view, opts){
   drawFrame(ctx, W, H);
 }
 
+function drawCalibration(view){
+  var ctx = view.ctx, W = view.W, H = view.H;
+  if (!ctx) return;
+  var sc = W / REF_W;
+  ctx.fillStyle = '#0E1014';
+  ctx.fillRect(0, 0, W, H);
+  drawBoard(ctx, W, H, F_REF, CAL_TRUE, sc);
+
+  calibrationPoints.forEach(function(point){
+    var observed = project(point[0], point[1], F_REF, sc, W, H, CAL_TRUE);
+    var predicted = project(point[0], point[1], F_REF, sc, W, H, calibrationGuess);
+    ctx.beginPath();
+    ctx.moveTo(observed[0], observed[1]);
+    ctx.lineTo(predicted[0], predicted[1]);
+    ctx.strokeStyle = 'rgba(117,201,221,.75)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(predicted[0], predicted[1], 6, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(14,16,20,.7)';
+    ctx.fill();
+    ctx.strokeStyle = '#75C9DD';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(observed[0], observed[1], 3.6, 0, Math.PI * 2);
+    ctx.fillStyle = '#FF8A63';
+    ctx.fill();
+  });
+  drawFrame(ctx, W, H);
+}
+
 /* ==================================================
    五、画成功率曲线
    ================================================== */
@@ -838,7 +982,7 @@ function drawChart(view, err){
   ctx.fillStyle = 'rgba(255,255,255,0.38)';
   ctx.fillText('抓取成功率 %', x0, y0 - 20);
   ctx.textAlign = 'right';
-  ctx.fillText('角点偏移（像素）', x1, y1 + 26);
+  ctx.fillText('角点偏移 RMS (px)', x1, y1 + 26);
   ctx.restore();
 
   // 曲线
@@ -897,12 +1041,15 @@ function drawChart(view, err){
 
 var vf2   = makeView(document.getElementById('vf2'), 0.625);
 var vf3   = makeView(document.getElementById('vf3'), 0.625);
+var calib = makeView(document.getElementById('calib'), 0.625);
 var chart = makeView(document.getElementById('chart'), 0.56);
 
 var elFocal  = document.getElementById('focal');
 var elDist   = document.getElementById('dist');
+var elDist5  = document.getElementById('dist5');
 var elFocalV = document.getElementById('focalVal');
 var elDistV  = document.getElementById('distVal');
+var elDist5V = document.getElementById('dist5Val');
 var elFov    = document.getElementById('fovVal');
 var elCells  = document.getElementById('cellCount');
 var elCellPx = document.getElementById('cellPx');
@@ -912,6 +1059,17 @@ var elErrMax = document.getElementById('errMax');
 var elVerd   = document.getElementById('verdict');
 var elSucc   = document.getElementById('succVal');
 var elDrop   = document.getElementById('dropVal');
+var elGuess  = document.getElementById('guess');
+var elGuessV = document.getElementById('guessVal');
+var elResidual = document.getElementById('residualVal');
+var elResidualMax = document.getElementById('residualMax');
+var elCalibFeedback = document.getElementById('calibFeedback');
+var elPixelError = document.getElementById('pixelError');
+var elPixelErrorV = document.getElementById('pixelErrorVal');
+var elDepth = document.getElementById('depth');
+var elDepthV = document.getElementById('depthVal');
+var elConvertFocal = document.getElementById('convertFocal');
+var elWorldError = document.getElementById('worldError');
 var resetBtn = document.getElementById('resetBtn');
 var mobileResetBtn = document.getElementById('mobileResetBtn');
 var menuBtn = document.getElementById('menuBtn');
@@ -919,7 +1077,16 @@ var closeMenuBtn = document.getElementById('closeMenuBtn');
 var mobileNav = document.getElementById('mobileNav');
 var shareBtn = document.getElementById('shareBtn');
 var shareStatus = document.getElementById('shareStatus');
+var notice = document.getElementById('notice');
 var activeSection = 'top';
+var noticeTimer = null;
+
+function showNotice(message){
+  clearTimeout(noticeTimer);
+  notice.textContent = message;
+  notice.hidden = false;
+  noticeTimer = setTimeout(function(){ notice.hidden = true; }, 2800);
+}
 
 function fmt(n, d){
   if (!isFinite(n)) return '—';
@@ -940,6 +1107,7 @@ function render(){
   // 两张取景器
   drawScene(vf2, { ideal: false });
   drawScene(vf3, { ideal: true });
+  drawCalibration(calib);
 
   // 第二幕读数
   var fov = 2 * Math.atan(REF_W / (2 * state.f)) * 180 / Math.PI;
@@ -951,19 +1119,36 @@ function render(){
   elCellPx.innerHTML = fmt(state.f * CELL, 0) + '<span class="u">px</span>';
 
   // 第三幕读数
-  elDistV.textContent = state.k1.toFixed(2);
+  elDistV.textContent = state.k1.toFixed(3);
+  elDist5.value = state.k1;
+  elDist5V.textContent = state.k1.toFixed(3);
   elErrB.innerHTML = fmt(st.rms, 1) + '<span class="u">px</span>';
   elErrMax.innerHTML = fmt(st.max, 1) + '<span class="u">px</span>';
   elVerd.textContent = verdictOf(st.rms);
 
-  // 第四幕
+  var cal = calibrationStats();
+  elGuessV.textContent = calibrationGuess.toFixed(3);
+  elResidual.innerHTML = fmt(cal.rms, 1) + '<span class="u">px</span>';
+  elResidualMax.innerHTML = fmt(cal.max, 1) + '<span class="u">px</span>';
+
+  elPixelErrorV.textContent = pixelError;
+  elDepthV.textContent = depth.toFixed(2);
+  elConvertFocal.innerHTML = fmt(state.f, 0) + '<span class="u">px</span>';
+  elWorldError.innerHTML = fmt(1000 * depth * pixelError / state.f, 1) + '<span class="u">mm</span>';
+
+  // 第五幕
   drawChart(chart, st.rms);
   var s = success(st.rms);
   elErrC.innerHTML = fmt(st.rms, 1) + '<span class="u">px</span>';
   elSucc.innerHTML = fmt(s, 0) + '<span class="u">%</span>';
-  elDrop.textContent = s >= 99.5 ? '几乎无损' : '下降 ' + fmt(100 - s, 0) + ' 个百分点';
+  var drop = success(0) - s;
+  elDrop.textContent = drop < 0.5 ? '几乎无损' : '下降 ' + fmt(drop, 0) + ' 个百分点';
   elFocal.style.setProperty('--pct', (((state.f - F_MIN) / (F_MAX - F_MIN)) * 100).toFixed(2) + '%');
   elDist.style.setProperty('--pct', (((state.k1 - K_MIN) / (K_MAX - K_MIN)) * 100).toFixed(2) + '%');
+  elDist5.style.setProperty('--pct', (((state.k1 - K_MIN) / (K_MAX - K_MIN)) * 100).toFixed(2) + '%');
+  elGuess.style.setProperty('--pct', (((calibrationGuess - K_MIN) / (K_MAX - K_MIN)) * 100).toFixed(2) + '%');
+  elPixelError.style.setProperty('--pct', (pixelError / 40 * 100).toFixed(2) + '%');
+  elDepth.style.setProperty('--pct', ((depth - 0.30) / 0.90 * 100).toFixed(2) + '%');
 }
 
 /* ==================================================
@@ -978,6 +1163,16 @@ function onDist(){
   state.k1 = parseFloat(elDist.value);
   render();
 }
+function onGuess(){
+  calibrationGuess = parseFloat(elGuess.value);
+  elCalibFeedback.textContent = '';
+  render();
+}
+function onConversion(){
+  pixelError = parseFloat(elPixelError.value);
+  depth = parseFloat(elDepth.value);
+  render();
+}
 
 function setPreset(kind, value){
   if (kind === 'focal') { elFocal.value = value; onFocal(); }
@@ -985,10 +1180,28 @@ function setPreset(kind, value){
 }
 
 function resetExperiment(){
-  setPreset('focal', 500);
-  setPreset('dist', -0.12);
-  shareStatus.textContent = '已恢复默认参数';
-  setTimeout(function(){ shareStatus.textContent = ''; }, 1800);
+  elFocal.value = 500;
+  elDist.value = -0.12;
+  elGuess.value = 0;
+  elPixelError.value = 12;
+  elDepth.value = 0.60;
+  state.f = 500;
+  state.k1 = -0.12;
+  calibrationGuess = 0;
+  pixelError = 12;
+  depth = 0.60;
+  elCalibFeedback.textContent = '';
+  render();
+  var url = new URL(window.location.href);
+  url.searchParams.delete('f');
+  url.searchParams.delete('k');
+  url.searchParams.delete('g');
+  url.searchParams.delete('u');
+  url.searchParams.delete('z');
+  window.history.replaceState(null, '', url.toString());
+  setMenu(false);
+  shareStatus.textContent = '';
+  showNotice('已恢复默认参数');
 }
 
 function setMenu(open){
@@ -1001,23 +1214,63 @@ function copyShareLink(){
   url.hash = activeSection && activeSection !== 'top' ? activeSection : 'top';
   url.searchParams.set('f', Math.round(state.f));
   url.searchParams.set('k', state.k1.toFixed(3));
+  url.searchParams.set('g', calibrationGuess.toFixed(3));
+  url.searchParams.set('u', pixelError);
+  url.searchParams.set('z', depth.toFixed(2));
   var text = url.toString();
-  if (navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(function(){
-      shareStatus.textContent = '链接已复制，可直接分享当前参数';
-    }).catch(function(){ shareStatus.textContent = text; });
-  } else {
-    shareStatus.textContent = text;
+  var message = window.location.protocol === 'file:'
+    ? '链接已复制；本地文件只能在本机打开，发布后再分享'
+    : '链接已复制，可分享当前参数';
+  function copied(){ shareStatus.textContent = message; showNotice(message); }
+  function fallback(){
+    var input = document.createElement('textarea');
+    input.value = text;
+    input.style.position = 'fixed';
+    input.style.opacity = '0';
+    document.body.appendChild(input);
+    input.select();
+    var ok = document.execCommand('copy');
+    input.remove();
+    if (ok) copied();
+    else { shareStatus.textContent = text; showNotice('复制失败，请手动复制下方链接'); }
   }
-  setTimeout(function(){ if (shareStatus.textContent === '链接已复制，可直接分享当前参数') shareStatus.textContent = ''; }, 2600);
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(copied).catch(fallback);
+  } else {
+    fallback();
+  }
 }
 
 elFocal.addEventListener('input', onFocal);
 elDist.addEventListener('input', onDist);
+elDist5.addEventListener('input', function(){ elDist.value = elDist5.value; onDist(); });
+elGuess.addEventListener('input', onGuess);
+elPixelError.addEventListener('input', onConversion);
+elDepth.addEventListener('input', onConversion);
+document.getElementById('checkGuess').addEventListener('click', function(){
+  var residual = calibrationStats().rms;
+  elCalibFeedback.textContent = residual < 1
+    ? '拟合很接近：预测角点与模拟观测基本重合。'
+    : residual < 5
+      ? '已经接近。继续微调，让剩余偏差再小一些。'
+      : '偏差还比较明显。观察画面边缘的两组点，继续调整。';
+});
+document.getElementById('showAnswer').addEventListener('click', function(){
+  elCalibFeedback.textContent = '这台模拟相机的参考值是 k₁ = -0.230。可以拖到该值验证。';
+});
 resetBtn.addEventListener('click', resetExperiment);
 mobileResetBtn.addEventListener('click', resetExperiment);
 menuBtn.addEventListener('click', function(){ setMenu(mobileNav.hidden); });
 closeMenuBtn.addEventListener('click', function(){ setMenu(false); });
+document.addEventListener('keydown', function(event){
+  if (event.key === 'Escape' && !mobileNav.hidden){
+    setMenu(false);
+    menuBtn.focus();
+  }
+});
+document.addEventListener('click', function(event){
+  if (!mobileNav.hidden && !mobileNav.contains(event.target) && !menuBtn.contains(event.target)) setMenu(false);
+});
 shareBtn.addEventListener('click', copyShareLink);
 Array.prototype.forEach.call(document.querySelectorAll('[data-focal]'), function(btn){
   btn.addEventListener('click', function(){ setPreset('focal', parseFloat(btn.getAttribute('data-focal'))); });
@@ -1033,10 +1286,17 @@ Array.prototype.forEach.call(document.querySelectorAll('.mobile-nav a'), functio
 (function(){
   var params = new URLSearchParams(window.location.search);
   var f = parseFloat(params.get('f')), k = parseFloat(params.get('k'));
+  var g = parseFloat(params.get('g')), u = parseFloat(params.get('u')), z = parseFloat(params.get('z'));
   if (isFinite(f) && f >= F_MIN && f <= F_MAX) elFocal.value = f;
   if (isFinite(k) && k >= K_MIN && k <= K_MAX) elDist.value = k;
+  if (isFinite(g) && g >= K_MIN && g <= K_MAX) elGuess.value = g;
+  if (isFinite(u) && u >= 0 && u <= 40) elPixelError.value = u;
+  if (isFinite(z) && z >= 0.30 && z <= 1.20) elDepth.value = z;
   state.f = parseFloat(elFocal.value);
   state.k1 = parseFloat(elDist.value);
+  calibrationGuess = parseFloat(elGuess.value);
+  pixelError = parseFloat(elPixelError.value);
+  depth = parseFloat(elDepth.value);
 })();
 
 /* ==================================================
@@ -1080,6 +1340,7 @@ Array.prototype.forEach.call(document.querySelectorAll('.mobile-nav a'), functio
 function fitAll(){
   vf2.fit();
   vf3.fit();
+  calib.fit();
   chart.fit();
   render();
 }
